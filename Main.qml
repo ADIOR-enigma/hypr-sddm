@@ -99,6 +99,99 @@ Rectangle {
         }
     }
 
+    // Dynamic Color Extraction
+    property color extractedAccent: "#A9C78F"
+    
+    Timer {
+        id: colorDelay
+        interval: 1000 // Give it a full second
+        repeat: true   // Keep trying until we succeed
+        running: backgroundImage.status === Image.Ready && !colorExtractor.processed
+        onTriggered: colorExtractor.requestPaint()
+    }
+
+    Canvas {
+        id: colorExtractor
+        width: 60; height: 60
+        x: -100; y: -100 // Off-screen but "visible" for reliable rendering
+        z: -1
+        renderTarget: Canvas.Image
+        property bool processed: false
+        
+        onPaint: {
+            var ctx = getContext("2d");
+            var res = 60;
+            ctx.clearRect(0, 0, res, res);
+            ctx.drawImage(backgroundImage, 0, 0, res, res);
+            var imgData = ctx.getImageData(0, 0, res, res).data;
+            
+            if (!imgData || imgData.length === 0) return;
+
+            // 36 Buckets (10 degrees each) for high resolution hue detection
+            var histogram = new Array(36).fill(0);
+            var sampleColors = new Array(36).fill(null);
+            var vibrantFound = false;
+            
+            for (var i = 0; i < imgData.length; i += 4) {
+                var r = imgData[i] / 255;
+                var g = imgData[i+1] / 255;
+                var b = imgData[i+2] / 255;
+                var pCol = Qt.rgba(r, g, b, 1.0);
+                
+                // Filter: Must be colorful and not too dark
+                if (pCol.hsvSaturation > 0.3 && pCol.hsvValue > 0.25) {
+                    var h = pCol.hsvHue * 360;
+                    if (h < 0) continue;
+                    
+                    var bIdx = Math.floor(h / 10) % 36;
+                    // Weight: Focus on saturation to find the "intended" accent
+                    var weight = pCol.hsvSaturation * pCol.hsvValue;
+                    histogram[bIdx] += weight;
+                    
+                    if (!sampleColors[bIdx] || weight > (sampleColors[bIdx].hsvSaturation * sampleColors[bIdx].hsvValue)) {
+                        sampleColors[bIdx] = pCol;
+                    }
+                    vibrantFound = true;
+                }
+            }
+            
+            if (!vibrantFound) return; // Keep trying
+
+            // Merge Red wrap (350-360 and 0-10)
+            histogram[0] += histogram[35];
+            
+            // Find the most frequent vibrant hue (The Mode)
+            var maxCount = -1;
+            var winnerIdx = -1;
+            for (var j = 0; j < 35; j++) {
+                if (histogram[j] > maxCount) {
+                    maxCount = histogram[j];
+                    winnerIdx = j;
+                }
+            }
+            
+            if (winnerIdx !== -1 && sampleColors[winnerIdx]) {
+                var finalColor = sampleColors[winnerIdx];
+                var h = finalColor.hsvHue;
+                // Slightly decreased saturation for a more professional look
+                var s = Math.max(0.35, Math.min(0.55, finalColor.hsvSaturation * 0.9));
+                container.extractedAccent = Qt.hsva(h, s, 0.95, 1.0);
+                console.log("Pixie SDDM: SUCCESS! Extracted Hue: " + (h * 360).toFixed(0) + "°");
+                processed = true; // Stop the timer
+            }
+        }
+    }
+
+    Connections {
+        target: backgroundImage
+        onStatusChanged: {
+            if (backgroundImage.status === Image.Ready) {
+                colorExtractor.processed = false;
+                colorDelay.start();
+            }
+        }
+    }
+
     FontLoader { id: fontRegular; source: "assets/fonts/FlexRounded-R.ttf" }
     FontLoader { id: fontMedium; source: "assets/fonts/FlexRounded-M.ttf" }
     FontLoader { id: fontBold; source: "assets/fonts/FlexRounded-B.ttf" }
@@ -134,8 +227,10 @@ Rectangle {
             topMargin: 30
             rightMargin: 40
         }
-        textColor: "#D4E4BC"
+        textColor: container.extractedAccent
         z: 100
+        opacity: colorExtractor.processed ? 1 : 0
+        Behavior on opacity { NumberAnimation { duration: 300 } }
     }
 
     Shortcut {
@@ -158,7 +253,7 @@ Rectangle {
     Text {
         id: dateText
         text: Qt.formatDateTime(new Date(), "dddd, MMMM d")
-        color: "#D4E4BC"
+        color: container.extractedAccent
         font.pixelSize: 22
         font.family: config.fontFamily
         anchors {
@@ -167,6 +262,8 @@ Rectangle {
             topMargin: 50
             leftMargin: 60
         }
+        opacity: colorExtractor.processed ? 1 : 0
+        Behavior on opacity { NumberAnimation { duration: 300 } }
     }
 
     Item {
@@ -179,9 +276,11 @@ Rectangle {
         Clock {
             id: mainClock
             anchors.centerIn: parent
-            hoursColor: "#AED68A"
-            minutesColor: "#D4E4BC"
+            backgroundSource: config.background
+            baseAccent: container.extractedAccent
             fontFamily: config.fontFamily
+            opacity: colorExtractor.processed ? 1 : 0
+            Behavior on opacity { NumberAnimation { duration: 300 } }
         }
         
         Text {
@@ -269,7 +368,7 @@ Rectangle {
                                 }
                                 return n.charAt(0).toUpperCase();
                             }
-                            color: config.accentColor
+                            color: container.extractedAccent
                             font.pixelSize: 48
                             font.family: fontBold.name
                             font.weight: Font.Bold
@@ -369,7 +468,7 @@ Rectangle {
                     color: (sessionClickArea.pressed || sessionPopup.opened) ? "#3D3F37" : "#2D2F27"
                     radius: 18
                     border.width: 1
-                    border.color: (sessionClickArea.pressed || sessionPopup.opened) ? config.accentColor : "#3D3F37"
+                    border.color: (sessionClickArea.pressed || sessionPopup.opened) ? container.extractedAccent : "#3D3F37"
                     
                     scale: sessionClickArea.pressed ? 0.95 : 1.0
                     Behavior on scale { NumberAnimation { duration: 100 } }
@@ -379,7 +478,7 @@ Rectangle {
                         spacing: 8
                         Text { 
                             text: "󰟀" 
-                            color: config.accentColor
+                            color: container.extractedAccent
                             font.pixelSize: 16
                         }
                         Text {
@@ -424,7 +523,7 @@ Rectangle {
                         color: "#2D2F27"
                         radius: 16
                         border.width: parent.activeFocus ? 2 : 0
-                        border.color: config.accentColor
+                        border.color: container.extractedAccent
                         opacity: parent.enabled ? 1.0 : 0.5
                     }
                     
@@ -443,7 +542,7 @@ Rectangle {
                 Text {
                     id: numLockIndicator
                     text: "Num Lock is on"
-                    color: "#D4E4BC"
+                    color: container.extractedAccent
                     font.pixelSize: 14
                     font.family: config.fontFamily
                     font.weight: Font.Medium
@@ -475,7 +574,7 @@ Rectangle {
                     }
 
                     background: Rectangle {
-                        color: container.isLoggingIn ? "#3D3F37" : (loginButton.pressed ? Qt.darker(config.accentColor, 1.1) : config.accentColor)
+                        color: container.isLoggingIn ? "#3D3F37" : (loginButton.pressed ? Qt.darker(container.extractedAccent, 1.1) : container.extractedAccent)
                         radius: 32
                         opacity: container.isLoggingIn ? 0.5 : 1.0
                     }
@@ -538,7 +637,7 @@ Rectangle {
                         anchors.leftMargin: 8
                         width: 4
                         height: isCurrent ? 16 : 0
-                        color: config.accentColor
+                        color: container.extractedAccent
                         radius: 2
                         Behavior on height { NumberAnimation { duration: 150 } }
                     }
@@ -551,7 +650,7 @@ Rectangle {
                         Layout.preferredWidth: 28
                         Layout.preferredHeight: 28
                         Layout.alignment: Qt.AlignVCenter
-                        color: isCurrent ? config.accentColor : "#3D3F37"
+                        color: isCurrent ? container.extractedAccent : "#3D3F37"
                         radius: 14
                         Text {
                             anchors.centerIn: parent
@@ -642,7 +741,7 @@ Rectangle {
                         anchors.leftMargin: 8
                         width: 4
                         height: isCurrent ? 16 : 0
-                        color: config.accentColor
+                        color: container.extractedAccent
                         radius: 2
                         Behavior on height { NumberAnimation { duration: 150 } }
                     }
@@ -654,7 +753,7 @@ Rectangle {
                     Text { 
                         Layout.preferredWidth: 40
                         text: "󰟀"
-                        color: isCurrent ? config.accentColor : "gray"
+                        color: isCurrent ? container.extractedAccent : "gray"
                         font.pixelSize: 16
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter

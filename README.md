@@ -10,7 +10,9 @@ A clean, modern, and minimal SDDM theme inspired by Google Pixel UI and Material
 ## 🌟 Features
 
 - **Pixel Aesthetic:** Clean typography and a unique two-tone stacked clock.
-- **Material Design 3:** Dark card UI with smooth animations and "Material You" inspired accents.
+- **Material You Dynamic Colors (v2.0):** Intelligent color extraction logic that automatically samples your wallpaper to create a perfectly matched dual-tone clock and UI accents.
+- **Smooth Transitions:** High-performance fade-in animations for the clock and UI elements once color extraction is complete.
+- **Material Design 3:** Dark card UI with "Material You" inspired accents and smooth interactions.
 - **Interactive Dropdowns:** Sophisticated user and session selection menus with perfect vertical alignment.
 - **Keyboard Navigation:** Full support for navigating menus with `Up`/`Down` arrows and confirming with `Enter`.
 - **Intelligent Fallbacks:** 
@@ -20,23 +22,26 @@ A clean, modern, and minimal SDDM theme inspired by Google Pixel UI and Material
 
 ## 🚀 Installation
 
-The easiest way to install **Pixie** is by using the provided installation script:
+The easiest way to install **Pixie** is by using the provided interactive installation script:
 
 **(Recommended)**
 ```bash
 git clone https://github.com/xCaptaiN09/pixie-sddm.git && cd pixie-sddm && sudo ./install.sh
 ```
 
+The script will copy the files and offer to automatically set Pixie as your active theme.
+
 ### Manual Installation (Alternative)
 
-1. **Clone the repository:**
+1. **Clone and enter the repository:**
    ```bash
-   git clone https://github.com/xCaptaiN09/pixie-sddm.git
+   git clone https://github.com/xCaptaiN09/pixie-sddm.git && cd pixie-sddm
    ```
 
-2. **Move to SDDM themes directory:**
+2. **Copy the theme to SDDM directory:**
    ```bash
-   sudo cp -r pixie-sddm /usr/share/sddm/themes/pixie
+   sudo mkdir -p /usr/share/sddm/themes/pixie
+   sudo cp -r * /usr/share/sddm/themes/pixie/
    ```
 
 ### 3. Test the theme (Optional)
@@ -47,7 +52,7 @@ sddm-greeter --test-mode --theme /usr/share/sddm/themes/pixie
 
 ## 🛠 Configuration
 
-To set **Pixie** as your active theme, edit your SDDM configuration file (usually `/etc/sddm.conf` or a file in `/etc/sddm.conf.d/`):
+If you didn't use the automatic installer, you can set **Pixie** as your active theme by editing your SDDM configuration file (usually `/etc/sddm.conf` or a file in `/etc/sddm.conf.d/`):
 
 ```ini
 [Theme]
@@ -58,16 +63,15 @@ Current=pixie
 
 You can easily customize the theme by editing the `theme.conf` file inside the theme directory:
 
-- **Background:** Replace `assets/background.jpg` with your own wallpaper.
-- **Colors:** Change `accentColor` or `backgroundColor` to match your setup.
-- **Fonts:** The theme uses `Google Sans Flex` by default.
+- **Background:** Replace `assets/background.jpg` with your own wallpaper. The theme will automatically adapt its colors!
+- **Accent Fallback:** The `accentColor` setting now acts as a smart fallback if the automatic extraction needs a manual hint.
+- **Fonts:** The theme uses `Google Sans Flex` (included).
 
 ## 📦 Requirements
 
 - **SDDM**
-- **QtQuick Controls 2**
-- **QtGraphicalEffects**
-- **Nerd Fonts** (for icons)
+- **Qt 5** (Specifically `QtQuick Controls 2`, `Layouts`, and `GraphicalEffects`)
+- **Nerd Fonts** (for power icons)
 
 ## 🤝 Credits
 
