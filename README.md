@@ -25,61 +25,56 @@ A clean, modern, and minimal SDDM theme inspired by Google Pixel UI and Material
 
 ---
 
-## 📦 Prerequisites
+## 📦 Installation & Versioning
 
-Pixie SDDM is now a **Professional Qt6 Theme**, optimized for modern, bleeding-edge distributions (Fedora 40+, Arch Linux, NixOS, etc.). 
+Pixie SDDM now supports both the latest **Qt6** engine and the legacy **Qt5** engine.
 
-To avoid a black screen, ensure you have the required Qt6 modules installed:
+| System Type | Engine | Recommended Branch |
+| :--- | :--- | :--- |
+| **Bleeding Edge** (Fedora 40+, Arch, Nix, Cachy) | **Qt6** | `main` (Default) |
+| **Stable/LTS** (Ubuntu 22.04/24.04, Debian 12) | **Qt5** | `qt5` |
 
-<details>
-<summary><b>Arch Linux / CachyOS / Manjaro</b> (Click to expand)</summary>
-
+### 1. Automatic Script (Recommended)
+This script detects your system and installs the theme.
 ```bash
-sudo pacman -S --needed qt6-declarative qt6-svg qt6-quickcontrols2 qt6-effects
+git clone https://github.com/xCaptaiN09/pixie-sddm.git
+cd pixie-sddm
+
+# OPTIONAL: If you are on an older Qt5 system (Ubuntu/Debian):
+# git checkout qt5
+
+sudo ./install.sh
 ```
-</details>
 
-<details>
-<summary><b>Fedora / RHEL / CentOS</b> (Click to expand)</summary>
-
-```bash
-sudo dnf install qt6-qtdeclarative qt6-qtsvg qt6-qtquickcontrols2 qt6-qteffects
-```
-</details>
-
-<details>
-<summary><b>openSUSE</b> (Click to expand)</summary>
-
-```bash
-sudo zypper install qt6-declarative qt6-svg qt6-quickcontrols2 qt6-effects
-```
-</details>
-
-<details>
-<summary><b>Ubuntu 24.10+ / Debian Trixie</b> (Click to expand)</summary>
-
-```bash
-sudo apt update && sudo apt install qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtquick-effects libqt6svg6
-```
-</details>
-
----
-
-## 🚀 Installation
-
-### 1. Arch Linux (AUR)
-Install the theme using your favorite AUR helper:
+### 2. Arch Linux (AUR)
+The AUR package automatically tracks the latest version:
 ```bash
 yay -S pixie-sddm-git
 ```
 
-### 2. Automatic Script (Other Distros)
-Recommended for most users. This script handles file copying and optional configuration:
+---
+
+## 🛠 Prerequisites
+
+Ensure you have the required modules for your version:
+
+<details>
+<summary><b>Qt6 (Default / Main Branch)</b></summary>
+
 ```bash
-git clone https://github.com/xCaptaiN09/pixie-sddm.git
-cd pixie-sddm
-sudo ./install.sh
+# Arch: sudo pacman -S qt6-declarative qt6-svg qt6-quickcontrols2
+# Fedora: sudo dnf install qt6-qtdeclarative qt6-qtsvg qt6-qtquickcontrols2
 ```
+</details>
+
+<details>
+<summary><b>Qt5 (Legacy / qt5 Branch)</b></summary>
+
+```bash
+# Ubuntu: sudo apt install qml-module-qtgraphicaleffects qml-module-qtquick-controls2
+# Arch: sudo pacman -S qt5-graphicaleffects qt5-quickcontrols2
+```
+</details>
 
 ### 3. NixOS (Declarative)
 NixOS users should add the following snippet to their `/etc/nixos/configuration.nix`:
