@@ -77,7 +77,9 @@ Ensure you have the required modules for your version:
 </details>
 
 ### 3. NixOS (Declarative)
-NixOS users should add the following snippet to their `/etc/nixos/configuration.nix`:
+NixOS users should add the following to their `configuration.nix`. 
+
+**Note:** This snippet uses the **Qt6** version. For **Qt5**, change `rev = "main"` to `rev = "qt5"` and use `pkgs.libsForQt5` packages.
 
 ```nix
 { pkgs, ... }: {
@@ -92,8 +94,8 @@ NixOS users should add the following snippet to their `/etc/nixos/configuration.
       src = pkgs.fetchFromGitHub {
         owner = "xCaptaiN09";
         repo = "pixie-sddm";
-        rev = "main";
-        sha256 = "sha256-0000000000000000000000000000000000000000000="; # Nix will prompt for the correct hash
+        rev = "main"; # Change to "qt5" for legacy systems
+        sha256 = "sha256-0000000000000000000000000000000000000000000=";
       };
       installPhase = ''
         mkdir -p $out/share/sddm/themes/pixie
