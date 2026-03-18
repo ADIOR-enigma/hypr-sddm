@@ -1,9 +1,3 @@
-/**
- * Pixie SDDM
- * A minimal SDDM theme inspired by Pixel UI and Material Design 3.
- * Author: xCaptaiN09
- * GitHub: https://github.com/xCaptaiN09/pixie-sddm
- */
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
