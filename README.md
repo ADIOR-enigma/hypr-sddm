@@ -46,11 +46,11 @@ sudo ./install.sh
 
 ### Method B: Manual
 1. Copy the folder to SDDM themes directory:
-   `sudo cp -r hypr-sddm /usr/share/sddm/themes/hyprpixie`
+   `sudo cp -r hypr-sddm /usr/share/sddm/themes/hyprsddm`
 2. Set the theme in `/etc/sddm.conf`:
    ```ini
    [Theme]
-   Current=hyprpixie
+   Current=hyprsddm
    ```
 
 
@@ -59,7 +59,7 @@ sudo ./install.sh
 ### Preview Without Logging Out
 Run this command to preview the theme safely:
 ```bash
-sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/hyprpixie
+sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/hyprsddm
 ```
 
 ### Customization
