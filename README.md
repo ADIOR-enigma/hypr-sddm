@@ -3,22 +3,8 @@
 A clean, modern, and minimal SDDM theme inspired by hyprlock and styled with a sleek, contemporary Linux aesthetic. Supports only the latest Qt6 engine.
 
 <div align="center">
-  <img src="screenshots/lock_screen.png" width="45%" alt="Lock Screen" />
-  <img src="screenshots/login_screen.png" width="45%" alt="Login Screen" />
-</div>
-
-<div align="center">
-  <img src="screenshots/lock_screen_2.png" width="22%" />
-  <img src="screenshots/login_screen_2.png" width="22%" />
-  <img src="screenshots/lock_screen_3.png" width="22%" />
-  <img src="screenshots/login_screen_3.png" width="22%" />
-</div>
-
-<div align="center">
-  <img src="screenshots/lock_screen_4.png" width="22%" />
-  <img src="screenshots/login_screen_4.png" width="22%" />
-  <img src="screenshots/lock_screen_5.png" width="22%" />
-  <img src="screenshots/login_screen_5.png" width="22%" />
+  <img width="1920" height="1080" alt="lock" src="https://github.com/user-attachments/assets/ee474ab3-b316-4fb9-8b89-a9eb4e1459ec" />
+<img width="1920" height="1080" alt="login" src="https://github.com/user-attachments/assets/7f3ce785-dbc9-4b02-bd12-d383a4a7f1d8" />
 </div>
 
 ## 🌟 Features
