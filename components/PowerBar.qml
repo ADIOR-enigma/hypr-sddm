@@ -1,7 +1,3 @@
-/**
- * Pixie SDDM - PowerBar Component
- * Author: xCaptaiN09
- */
 import QtQuick
 
 Row {
