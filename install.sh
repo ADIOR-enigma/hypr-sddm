@@ -5,7 +5,7 @@
 
 set -e
 
-THEME_NAME="hyprpixie"
+THEME_NAME="hyprsddm"
 THEME_DIR="/usr/share/sddm/themes/${THEME_NAME}"
 
 # Colors
