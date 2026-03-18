@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Pixie SDDM - Universal Smart Installer
+# Hypr SDDM - Universal Smart Installer
 # Author: xCaptaiN09
 
 set -e
 
-THEME_NAME="pixie"
+THEME_NAME="hyprpixie"
 THEME_DIR="/usr/share/sddm/themes/${THEME_NAME}"
 
 # Colors
@@ -15,7 +15,7 @@ YELLOW='\033[0;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}==>${NC} Starting Pixie SDDM Installation..."
+echo -e "${BLUE}==>${NC} Starting Hypr SDDM Installation..."
 
 # 1. SYSTEM DETECTION
 if command -v sddm-greeter-qt6 >/dev/null 2>&1; then
@@ -59,16 +59,16 @@ if [ -d "${THEME_DIR}" ]; then
     rm -rf "${THEME_DIR}"
 fi
 
-echo -e "${BLUE}==>${NC} Installing Pixie (Qt${SYSTEM_QT}) to ${THEME_DIR}..."
+echo -e "${BLUE}==>${NC} Installing Hypr (Qt${SYSTEM_QT}) to ${THEME_DIR}..."
 mkdir -p "${THEME_DIR}"
 cp -r assets components Main.qml metadata.desktop theme.conf LICENSE "${THEME_DIR}/"
 chmod -R 755 "${THEME_DIR}"
 
-echo -e "${GREEN}Done!${NC} Pixie SDDM is now installed."
+echo -e "${GREEN}Done!${NC} Hypr SDDM is now installed."
 
 # 6. CONFIGURATION
 echo -e ""
-read -p "Apply Pixie as your active theme now? (y/N) " -n 1 -r
+read -p "Apply Hypr as your active theme now? (y/N) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     mkdir -p /etc/sddm.conf.d

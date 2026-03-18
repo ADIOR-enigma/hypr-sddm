@@ -114,6 +114,11 @@ Rectangle {
 
     // Dynamic Color Extraction
     property color extractedAccent: "#A9C78F"
+    property color cardSurface: "#161814"
+    property color controlSurface: "#23261F"
+    property color controlSurfaceActive: "#31342D"
+    property color controlBorder: "#343830"
+    property color cardBorder: "#2B2E27"
 
     Timer {
         id: colorDelay
@@ -279,10 +284,10 @@ Rectangle {
         visible: loginState.visible
         opacity: loginState.visible && colorExtractor.processed ? 1 : 0
 
-        color: (sessionSwitcherArea.pressed || sessionPopup.opened) ? "#3D3F37" : "#2D2F27"
+        color: (sessionSwitcherArea.pressed || sessionPopup.opened) ? container.controlSurfaceActive : container.controlSurface
         radius: 20
         border.width: 1
-        border.color: (sessionSwitcherArea.pressed || sessionPopup.opened) ? container.extractedAccent : "#3D3F37"
+        border.color: (sessionSwitcherArea.pressed || sessionPopup.opened) ? container.extractedAccent : container.controlBorder
 
         scale: sessionSwitcherArea.pressed ? 0.97 : 1.0
         Behavior on scale {
@@ -354,10 +359,10 @@ Rectangle {
         visible: loginState.visible
         opacity: loginState.visible && colorExtractor.processed ? 1 : 0
 
-        color: (keyboardSwitcherArea.pressed || container.showVirtualKeyboard) ? "#3D3F37" : "#2D2F27"
+        color: (keyboardSwitcherArea.pressed || container.showVirtualKeyboard) ? container.controlSurfaceActive : container.controlSurface
         radius: 22
         border.width: 1
-        border.color: (keyboardSwitcherArea.pressed || container.showVirtualKeyboard) ? container.extractedAccent : "#3D3F37"
+        border.color: (keyboardSwitcherArea.pressed || container.showVirtualKeyboard) ? container.extractedAccent : container.controlBorder
 
         scale: keyboardSwitcherArea.pressed ? 0.97 : 1.0
         Behavior on scale {
@@ -710,9 +715,9 @@ Rectangle {
                     Layout.preferredWidth: Math.min(300, Math.max(180, userNameLabel.implicitWidth + 44))
                     Layout.preferredHeight: 42
                     radius: 21
-                    color: userClickArea.pressed ? "#31342D" : "#23261F"
+                    color: (userClickArea.pressed || userPopup.opened) ? container.controlSurfaceActive : container.controlSurface
                     border.width: 1
-                    border.color: userPopup.opened ? container.extractedAccent : "#343830"
+                    border.color: userPopup.opened ? container.extractedAccent : container.controlBorder
 
                     scale: userClickArea.pressed ? 0.98 : 1.0
                     Behavior on scale {
@@ -1182,3 +1187,4 @@ Rectangle {
         }
     }
 }
+
