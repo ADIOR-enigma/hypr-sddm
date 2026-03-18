@@ -1,7 +1,3 @@
-/**
- * Pixie SDDM - Clock Component
- * Author: xCaptaiN09
- */
 import QtQuick
 
 Item {
