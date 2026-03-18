@@ -39,18 +39,18 @@ Hypr SDDM automatically detects your system and installs the correct version.
 ### Method A: Automatic Script (Recommended)
 This script intelligently detects your Qt version and handles everything:
 ```bash
-git clone https://github.com/xCaptaiN09/pixie-sddm.git
-cd pixie-sddm
+git clone https://github.com/ADIOR-enigma/hypr-sddm.git
+cd hypr-sddm
 sudo ./install.sh
 ```
 
 ### Method B: Manual
 1. Copy the folder to SDDM themes directory:
-   `sudo cp -r pixie-sddm /usr/share/sddm/themes/pixie`
+   `sudo cp -r hypr-sddm /usr/share/sddm/themes/hyprpixie`
 2. Set the theme in `/etc/sddm.conf`:
    ```ini
    [Theme]
-   Current=pixie
+   Current=hyprpixie
    ```
 
 
@@ -59,7 +59,7 @@ sudo ./install.sh
 ### Preview Without Logging Out
 Run this command to preview the theme safely:
 ```bash
-sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/pixie
+sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/hyprpixie
 ```
 
 ### Customization
