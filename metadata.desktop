@@ -1,10 +1,10 @@
 [SddmGreeterTheme]
-Name=Pixie SDDM
-Description=A clean, modern, and minimal SDDM theme inspired by Google Pixel UI and Material Design 3.
-Author=xCaptaiN09
-Copyright=(c) 2026 xCaptaiN09
+Name=Hypr SDDM
+Description=A clean, modern, and minimal SDDM theme inspired by hyprlock.
+Author=adior_enigmac
+Copyright=(c) 2026 adior
 License=MIT
-Type=sddm-theme
+Type=hypr-theme
 Version=3.0
 MainScript=Main.qml
 Screenshot=screenshot.png
