@@ -73,3 +73,4 @@ Edit `theme.conf` or replace assets in `assets/`:
 - **Font:** Google Sans Flex (included).
 
 *Made with ❤️ for the Linux community.*
+hehe
