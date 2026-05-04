@@ -2,8 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Effects
-import QtQuick.VirtualKeyboard
-import QtQuick.VirtualKeyboard.Settings
+//import QtQuick.VirtualKeyboard
+//import QtQuick.VirtualKeyboard.Settings
 import "components"
 
 Rectangle {
@@ -106,28 +106,45 @@ Rectangle {
         }
     }
 
-    // Dynamic Color Extraction
+    // ===== Dynamic Color Extraction =====
     property color extractedAccent: "#A9C78F"
-    property color cardSurface: "#161814"
-    property color controlSurface: "#23261F"
-    property color controlSurfaceActive: "#31342D"
-    property color controlBorder: "#343830"
-    property color cardBorder: "#2B2E27"
 
+    function tone(h, s, v, a) {
+        return Qt.hsva(h, s, v, a);
+    }
+
+    // Accent
+    property color accent: extractedAccent
+
+    // Surfaces
+    property color surface:        tone(extractedAccent.hsvHue, Math.max(0.25, extractedAccent.hsvSaturation * 0.40), 0.15, 1.0)  // inputs/chips — mid
+    property color surfaceVariant: tone(extractedAccent.hsvHue, Math.max(0.30, extractedAccent.hsvSaturation * 0.50), 0.11, 1.0)  // card/popups — darkest
+    property color surfaceActive:  tone(extractedAccent.hsvHue, Math.max(0.35, extractedAccent.hsvSaturation * 0.60), 0.21, 1.0)  // hover/pressed — lightest
+
+    // Borders
+    property color border:       tone(extractedAccent.hsvHue, extractedAccent.hsvSaturation * 0.25, 0.35, 1.0)
+    property color borderStrong: tone(extractedAccent.hsvHue, extractedAccent.hsvSaturation * 0.45, 0.55, 1.0)
+
+    // Text
+    property color textPrimary:   surface.hsvValue > 0.5 ? "#000000" : "#ffffff"
+    property color textSecondary: surface.hsvValue > 0.5 ? Qt.rgba(0,0,0,0.7) : Qt.rgba(1,1,1,0.7)
+
+    // States
+    property color error: Qt.rgba(1, 0.3, 0.3, 0.7)
+
+    // Color Extraction Engine
     Timer {
         id: colorDelay
-        interval: 1000 // Give it a full second
-        repeat: true   // Keep trying until we succeed
+        interval: 1000
+        repeat: true
         running: backgroundImage.status === Image.Ready && !colorExtractor.processed
         onTriggered: colorExtractor.requestPaint()
     }
 
     Canvas {
         id: colorExtractor
-        width: 60
-        height: 60
-        x: -100
-        y: -100 // Off-screen but "visible" for reliable rendering
+        width: 60; height: 60
+        x: -100; y: -100
         z: -1
         renderTarget: Canvas.Image
         property bool processed: false
@@ -138,11 +155,8 @@ Rectangle {
             ctx.clearRect(0, 0, res, res);
             ctx.drawImage(backgroundImage, 0, 0, res, res);
             var imgData = ctx.getImageData(0, 0, res, res).data;
+            if (!imgData || imgData.length === 0) return;
 
-            if (!imgData || imgData.length === 0)
-                return;
-
-            // 36 Buckets (10 degrees each) for high resolution hue detection
             var histogram = new Array(36).fill(0);
             var sampleColors = new Array(36).fill(null);
             var vibrantFound = false;
@@ -152,32 +166,22 @@ Rectangle {
                 var g = imgData[i + 1] / 255;
                 var b = imgData[i + 2] / 255;
                 var pCol = Qt.rgba(r, g, b, 1.0);
-
-                // Filter: Must be colorful and not too dark
                 if (pCol.hsvSaturation > 0.3 && pCol.hsvValue > 0.25) {
                     var h = pCol.hsvHue * 360;
-                    if (h < 0)
-                        continue;
-
+                    if (h < 0) continue;
                     var bIdx = Math.floor(h / 10) % 36;
-                    // Weight: Focus on saturation to find the "intended" accent
                     var weight = pCol.hsvSaturation * pCol.hsvValue;
                     histogram[bIdx] += weight;
-
-                    if (!sampleColors[bIdx] || weight > (sampleColors[bIdx].hsvSaturation * sampleColors[bIdx].hsvValue)) {
+                    if (!sampleColors[bIdx] || weight > (sampleColors[bIdx].hsvSaturation * sampleColors[bIdx].hsvValue))
                         sampleColors[bIdx] = pCol;
-                    }
                     vibrantFound = true;
                 }
             }
 
-            if (!vibrantFound)
-                return; // Keep trying
+            if (!vibrantFound) return;
 
-            // Merge Red wrap (350-360 and 0-10)
             histogram[0] += histogram[35];
 
-            // Find the most frequent vibrant hue (The Mode)
             var maxCount = -1;
             var winnerIdx = -1;
             for (var j = 0; j < 35; j++) {
@@ -189,12 +193,11 @@ Rectangle {
 
             if (winnerIdx !== -1 && sampleColors[winnerIdx]) {
                 var finalColor = sampleColors[winnerIdx];
-                var h = finalColor.hsvHue;
-                // Slightly decreased saturation for a more professional look
+                var fh = finalColor.hsvHue;
                 var s = Math.max(0.35, Math.min(0.55, finalColor.hsvSaturation * 0.9));
-                container.extractedAccent = Qt.hsva(h, s, 0.95, 1.0);
-                console.log("Pixie SDDM: SUCCESS! Extracted Hue: " + (h * 360).toFixed(0) + "°");
-                processed = true; // Stop the timer
+                container.extractedAccent = Qt.hsva(fh, s, 0.85, 1.0);
+                console.log("Pixie SDDM: SUCCESS! Extracted Hue: " + (fh * 360).toFixed(0) + "°");
+                processed = true;
             }
         }
     }
@@ -209,19 +212,12 @@ Rectangle {
         }
     }
 
-    FontLoader {
-        id: fontRegular
-        source: "assets/fonts/FlexRounded-R.ttf"
-    }
-    FontLoader {
-        id: fontMedium
-        source: "assets/fonts/FlexRounded-M.ttf"
-    }
-    FontLoader {
-        id: fontBold
-        source: "assets/fonts/FlexRounded-B.ttf"
-    }
+    // Fonts
+    FontLoader { id: fontRegular; source: "assets/fonts/FlexRounded-R.ttf" }
+    FontLoader { id: fontMedium;  source: "assets/fonts/FlexRounded-M.ttf" }
+    FontLoader { id: fontBold;    source: "assets/fonts/FlexRounded-B.ttf" }
 
+    // Background
     Image {
         id: backgroundImage
         source: config.background
@@ -229,7 +225,7 @@ Rectangle {
         fillMode: Image.PreserveAspectCrop
     }
 
-    // High-Quality Standalone Blur (Qt6 Native)
+    // Blur layer
     MultiEffect {
         id: backgroundBlur
         anchors.fill: parent
@@ -239,66 +235,42 @@ Rectangle {
         opacity: loginState.visible ? 1.0 : 0.0
         autoPaddingEnabled: false
 
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 400
-                easing.type: Easing.InOutQuad
-            }
-        }
-        Behavior on blur {
-            NumberAnimation {
-                duration: 400
-                easing.type: Easing.InOutQuad
-            }
-        }
+        Behavior on opacity { NumberAnimation { duration: 400; easing.type: Easing.InOutQuad } }
+        Behavior on blur    { NumberAnimation { duration: 400; easing.type: Easing.InOutQuad } }
     }
 
+    // Dark overlay
     Rectangle {
         anchors.fill: parent
         color: "black"
         opacity: loginState.visible ? 0.6 : 0.4
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 400
-            }
-        }
+        Behavior on opacity { NumberAnimation { duration: 400 } }
     }
 
+    // Session Switcher (bottom-left)
     Rectangle {
         id: sessionSwitcherBottomLeft
-        width: 210
-        height: 40
+        width: 210; height: 40
         anchors {
-            left: parent.left
-            bottom: parent.bottom
-            leftMargin: 40
-            bottomMargin: 32
+            left: parent.left; bottom: parent.bottom
+            leftMargin: 40; bottomMargin: 32
         }
         z: 100
         visible: loginState.visible
         opacity: loginState.visible && colorExtractor.processed ? 1 : 0
 
-        color: (sessionSwitcherArea.pressed || sessionPopup.opened) ? container.controlSurfaceActive : container.controlSurface
+        color: (sessionSwitcherArea.pressed || sessionPopup.opened) ? container.surfaceActive : container.surface
         radius: 20
         border.width: 1
-        border.color: (sessionSwitcherArea.pressed || sessionPopup.opened) ? container.extractedAccent : container.controlBorder
+        border.color: (sessionSwitcherArea.pressed || sessionPopup.opened) ? container.borderStrong : container.border
 
         scale: sessionSwitcherArea.pressed ? 0.97 : 1.0
-        Behavior on scale {
-            NumberAnimation {
-                duration: 100
-            }
-        }
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 200
-            }
-        }
+        Behavior on scale   { NumberAnimation { duration: 100 } }
+        Behavior on opacity { NumberAnimation { duration: 200 } }
 
         RowLayout {
             anchors.fill: parent
-            anchors.leftMargin: 12
-            anchors.rightMargin: 12
+            anchors.leftMargin: 12; anchors.rightMargin: 12
             spacing: 6
 
             Text {
@@ -322,7 +294,7 @@ Rectangle {
                     }
                     return "Hyprland";
                 }
-                color: "white"
+                color: container.textPrimary
                 font.pixelSize: 12
                 font.weight: Font.Medium
                 font.family: config.fontFamily
@@ -338,43 +310,33 @@ Rectangle {
             onClicked: sessionPopup.open()
         }
     }
-
+/*
+    // ===== Virtual Keyboard Toggle (bottom-right) =====
     Rectangle {
         id: keyboardSwitcherBottomRight
-        width: 44
-        height: 44
+        width: 44; height: 44
         anchors {
-            right: parent.right
-            bottom: parent.bottom
-            rightMargin: 40
-            bottomMargin: 32
+            right: parent.right; bottom: parent.bottom
+            rightMargin: 40; bottomMargin: 32
         }
         z: 100
         visible: loginState.visible
         opacity: loginState.visible && colorExtractor.processed ? 1 : 0
 
-        color: (keyboardSwitcherArea.pressed || container.showVirtualKeyboard) ? container.controlSurfaceActive : container.controlSurface
+        color: (keyboardSwitcherArea.pressed || container.showVirtualKeyboard) ? container.surfaceActive : container.surface
         radius: 22
         border.width: 1
-        border.color: (keyboardSwitcherArea.pressed || container.showVirtualKeyboard) ? container.extractedAccent : container.controlBorder
+        border.color: (keyboardSwitcherArea.pressed || container.showVirtualKeyboard) ? container.borderStrong : container.border
 
         scale: keyboardSwitcherArea.pressed ? 0.97 : 1.0
-        Behavior on scale {
-            NumberAnimation {
-                duration: 100
-            }
-        }
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 200
-            }
-        }
+        Behavior on scale   { NumberAnimation { duration: 100 } }
+        Behavior on opacity { NumberAnimation { duration: 200 } }
 
         Text {
             anchors.centerIn: parent
             text: "⌨"
             color: container.extractedAccent
-            font.pixelSize: 16
+            font.pixelSize: 18
             font.family: config.fontFamily
         }
 
@@ -383,32 +345,71 @@ Rectangle {
             anchors.fill: parent
             onClicked: {
                 container.showVirtualKeyboard = !container.showVirtualKeyboard;
-                passwordField.forceActiveFocus();
+                if (container.showVirtualKeyboard) {
+                    passwordField.forceActiveFocus();
+                    Qt.inputMethod.show();
+                } else {
+                    Qt.inputMethod.hide();
+                }
             }
         }
     }
 
-    InputPanel {
-        id: virtualKeyboard
+    // ===== Virtual Keyboard Panel (themed) =====
+    Item {
+        id: keyboardContainer
         z: 200
-
         width: Math.min(container.width * 0.82, 1000)
-        x: (container.width - width) / 2
-        y: container.height - height
+        height: virtualKeyboard.implicitHeight + 24
 
-        active: Qt.inputMethod.visible
+        x: (container.width - width) / 2
+        y: container.height - height - 14
+
+        // FIX: drive visibility from our own flag, not Qt.inputMethod.visible
+        // which creates a boot-time chicken-and-egg deadlock
         visible: loginState.visible && container.showVirtualKeyboard
         opacity: visible ? 1.0 : 0.0
+        Behavior on opacity { NumberAnimation { duration: 220 } }
 
-        Component.onCompleted: {
-            VirtualKeyboardSettings.styleName = "default";
-            VirtualKeyboardSettings.closeOnReturn = true;
-            VirtualKeyboardSettings.visibleFunctionKeys = QtVirtualKeyboard.KeyboardFunctionKeys.None;
+        // Themed backdrop panel
+        Rectangle {
+            anchors.fill: parent
+            radius: 22
+            color: container.surfaceVariant
+            border.color: container.borderStrong
+            border.width: 1
+            opacity: 0.97
+
+            // Inner highlight ring
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: 1
+                radius: 21
+                color: "transparent"
+                border.width: 1
+                border.color: Qt.rgba(
+                    container.extractedAccent.r,
+                    container.extractedAccent.g,
+                    container.extractedAccent.b, 0.18)
+            }
         }
 
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 200
+        InputPanel {
+            id: virtualKeyboard
+            anchors {
+                fill: parent
+                margins: 12
+            }
+
+            // active must be true whenever we want it ready —
+            // decoupled from Qt.inputMethod.visible to avoid the boot freeze
+            active: container.showVirtualKeyboard
+
+            Component.onCompleted: {
+                VirtualKeyboardSettings.styleName = "default";
+                VirtualKeyboardSettings.closeOnReturn = false;
+                VirtualKeyboardSettings.visibleFunctionKeys =
+                    QtVirtualKeyboard.KeyboardFunctionKeys.None;
             }
         }
 
@@ -421,24 +422,20 @@ Rectangle {
             }
         }
     }
-
+*/
+    // Power Bar
     PowerBar {
         anchors {
-            top: parent.top
-            right: parent.right
-            topMargin: 30
-            rightMargin: 40
+            top: parent.top; right: parent.right
+            topMargin: 30; rightMargin: 40
         }
         textColor: container.extractedAccent
         z: 100
         opacity: colorExtractor.processed ? 1 : 0
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 300
-            }
-        }
+        Behavior on opacity { NumberAnimation { duration: 300 } }
     }
 
+    // Shortcuts
     Shortcut {
         sequence: "Escape"
         enabled: loginState.visible
@@ -458,36 +455,25 @@ Rectangle {
         onActivated: container.doLogin()
     }
 
+    // Date Label
     Text {
         id: dateText
         text: Qt.formatDateTime(new Date(), "dddd, MMMM d")
         color: container.extractedAccent
         font.pixelSize: 22
         font.family: config.fontFamily
-        anchors {
-            top: parent.top
-            left: parent.left
-            topMargin: 50
-            leftMargin: 60
-        }
+        anchors { top: parent.top; left: parent.left; topMargin: 50; leftMargin: 60 }
         opacity: colorExtractor.processed ? 1 : 0
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 300
-            }
-        }
+        Behavior on opacity { NumberAnimation { duration: 300 } }
     }
 
+    // Lock Screen
     Item {
         id: lockState
         anchors.fill: parent
         visible: !loginState.visible
         opacity: visible ? 1 : 0
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 400
-            }
-        }
+        Behavior on opacity { NumberAnimation { duration: 400 } }
 
         Clock {
             id: mainClock
@@ -496,22 +482,14 @@ Rectangle {
             baseAccent: container.extractedAccent
             fontFamily: config.fontFamily
             opacity: colorExtractor.processed ? 1 : 0
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: 300
-                }
-            }
+            Behavior on opacity { NumberAnimation { duration: 300 } }
         }
 
         Text {
             text: "Press any key to unlock"
             color: config.textColor
             font.pixelSize: 16
-            anchors {
-                bottom: parent.bottom
-                horizontalCenter: parent.horizontalCenter
-                bottomMargin: 100
-            }
+            anchors { bottom: parent.bottom; horizontalCenter: parent.horizontalCenter; bottomMargin: 100 }
             opacity: 0.5
         }
 
@@ -524,17 +502,14 @@ Rectangle {
         }
     }
 
+    // Login Card
     Item {
         id: loginState
         anchors.fill: parent
         visible: false
         opacity: visible ? 1 : 0
         z: 10
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 400
-            }
-        }
+        Behavior on opacity { NumberAnimation { duration: 400 } }
 
         onVisibleChanged: {
             if (visible)
@@ -542,96 +517,77 @@ Rectangle {
         }
 
         property bool isError: false
+
         SequentialAnimation {
             id: shakeAnimation
             loops: 2
             PropertyAnimation {
-                target: loginCard
-                property: "x"
+                target: loginCard; property: "x"
                 from: (container.width - loginCard.width) / 2
-                to: (container.width - loginCard.width) / 2 - 10
-                duration: 50
-                easing.type: Easing.InOutQuad
+                to:   (container.width - loginCard.width) / 2 - 10
+                duration: 50; easing.type: Easing.InOutQuad
             }
             PropertyAnimation {
-                target: loginCard
-                property: "x"
+                target: loginCard; property: "x"
                 from: (container.width - loginCard.width) / 2 - 10
-                to: (container.width - loginCard.width) / 2 + 10
-                duration: 50
-                easing.type: Easing.InOutQuad
+                to:   (container.width - loginCard.width) / 2 + 10
+                duration: 50; easing.type: Easing.InOutQuad
             }
             PropertyAnimation {
-                target: loginCard
-                property: "x"
+                target: loginCard; property: "x"
                 from: (container.width - loginCard.width) / 2 + 10
-                to: (container.width - loginCard.width) / 2
-                duration: 50
-                easing.type: Easing.InOutQuad
+                to:   (container.width - loginCard.width) / 2
+                duration: 50; easing.type: Easing.InOutQuad
             }
             onStopped: isError = false
         }
 
         Rectangle {
             id: loginCard
-            width: 400
-            height: 430
-            x: (parent.width - width) / 2
+            width: 400; height: 430
+            x: (parent.width  - width)  / 2
             y: (parent.height - height) / 2
-            color: loginState.isError ? "#442222" : "#161814"
+            color: loginState.isError ? container.error : container.surfaceVariant
             radius: 30
             border.width: 1
-            border.color: loginState.isError ? "#7A3A3A" : "#2B2E27"
-            opacity: 0.88
+            border.color: loginState.isError ? Qt.rgba(1, 0.4, 0.4, 0.6) : container.border
+            opacity: 1.0
 
-            Behavior on color {
-                ColorAnimation {
-                    duration: 200
-                }
-            }
-            Behavior on border.color {
-                ColorAnimation {
-                    duration: 200
-                }
-            }
+            Behavior on color        { ColorAnimation { duration: 200 } }
+            Behavior on border.color { ColorAnimation { duration: 200 } }
 
+            // Inner highlight ring
             Rectangle {
-                anchors.fill: parent
-                anchors.margins: 1
+                anchors.fill: parent; anchors.margins: 1
                 radius: 29
                 color: "transparent"
                 border.width: 1
-                border.color: "#20231D"
+                border.color: Qt.rgba(1,1,1,0.05)
                 opacity: 0.7
             }
 
             ColumnLayout {
                 anchors.fill: parent
-                anchors.leftMargin: 34
-                anchors.rightMargin: 34
-                anchors.topMargin: 54
-                anchors.bottomMargin: 34
+                anchors.leftMargin: 34; anchors.rightMargin: 34
+                anchors.topMargin: 54; anchors.bottomMargin: 34
                 spacing: 14
 
+                // Avatar
                 Item {
-                    Layout.preferredWidth: 108
-                    Layout.preferredHeight: 108
+                    Layout.preferredWidth: 108; Layout.preferredHeight: 108
                     Layout.alignment: Qt.AlignHCenter
 
                     Rectangle {
-                        anchors.fill: parent
-                        radius: width / 2
-                        color: "#23261F"
+                        anchors.fill: parent; radius: width / 2
+                        color: container.surface
                         border.width: 2
                         border.color: Qt.rgba(container.extractedAccent.r, container.extractedAccent.g, container.extractedAccent.b, 0.35)
                     }
 
                     Rectangle {
                         id: avatarFallback
-                        anchors.centerIn: parent
-                        width: 96
-                        height: 96
-                        color: "#2D2F27"
+                        anchors.centerIn: parent; width: 96; height: 96
+                        color: container.surfaceActive
                         radius: width / 2
                         visible: avatar.status !== Image.Ready
 
@@ -640,7 +596,7 @@ Rectangle {
                             text: {
                                 var n = "";
                                 if (typeof userModel !== "undefined" && userModel.count > 0) {
-                                    var d = userModel.data(userModel.index(container.userIndex, 0), Qt.DisplayRole);
+                                    var d  = userModel.data(userModel.index(container.userIndex, 0), Qt.DisplayRole);
                                     var nr = userModel.data(userModel.index(container.userIndex, 0), Qt.UserRole + 1);
                                     n = d ? d.toString() : (nr ? nr.toString() : "U");
                                 } else {
@@ -657,9 +613,7 @@ Rectangle {
 
                     Canvas {
                         id: avatarCanvas
-                        anchors.centerIn: parent
-                        width: 96
-                        height: 96
+                        anchors.centerIn: parent; width: 96; height: 96
                         visible: avatar.status === Image.Ready
 
                         onPaint: {
@@ -682,53 +636,39 @@ Rectangle {
                             id: avatar
                             anchors.fill: parent
                             fillMode: Image.PreserveAspectCrop
-                            smooth: true
-                            visible: false
+                            smooth: true; visible: false
 
                             Component.onCompleted: {
                                 var s = Qt.resolvedUrl("assets/avatar.jpg");
                                 if (typeof userModel !== "undefined" && userModel.count > 0) {
                                     var icon = userModel.data(userModel.index(container.userIndex, 0), Qt.UserRole + 3);
-                                    if (icon && icon.toString().match(/\.(jpg|jpeg|png|bmp|webp|svg)$/i)) {
+                                    if (icon && icon.toString().match(/\.(jpg|jpeg|png|bmp|webp|svg)$/i))
                                         s = icon.toString();
-                                    }
                                 }
                                 source = s;
                             }
 
                             onStatusChanged: {
-                                if (status === Image.Ready)
-                                    repaintTimer.start();
+                                if (status === Image.Ready) repaintTimer.start();
                             }
                         }
                     }
                 }
 
+                // Username chip
                 Rectangle {
                     Layout.alignment: Qt.AlignHCenter
                     Layout.preferredWidth: Math.min(300, Math.max(180, userNameLabel.implicitWidth + 44))
                     Layout.preferredHeight: 42
                     radius: 21
-                    color: (userClickArea.pressed || userPopup.opened) ? container.controlSurfaceActive : container.controlSurface
+                    color: (userClickArea.pressed || userPopup.opened) ? container.surfaceActive : container.surface
                     border.width: 1
-                    border.color: userPopup.opened ? container.extractedAccent : container.controlBorder
+                    border.color: userPopup.opened ? container.borderStrong : container.border
 
                     scale: userClickArea.pressed ? 0.98 : 1.0
-                    Behavior on scale {
-                        NumberAnimation {
-                            duration: 100
-                        }
-                    }
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: 120
-                        }
-                    }
-                    Behavior on border.color {
-                        ColorAnimation {
-                            duration: 140
-                        }
-                    }
+                    Behavior on scale        { NumberAnimation  { duration: 100 } }
+                    Behavior on color        { ColorAnimation   { duration: 120 } }
+                    Behavior on border.color { ColorAnimation   { duration: 140 } }
 
                     Text {
                         id: userNameLabel
@@ -738,18 +678,17 @@ Rectangle {
                             if (typeof userModel !== "undefined" && userModel.count > 0) {
                                 var idx = container.userIndex;
                                 var modelIdx = userModel.index(idx, 0);
-                                var display = userModel.data(modelIdx, Qt.DisplayRole);
-                                var edit = userModel.data(modelIdx, Qt.EditRole);
-                                var nr = userModel.data(modelIdx, Qt.UserRole + 1);
+                                var display  = userModel.data(modelIdx, Qt.DisplayRole);
+                                var edit     = userModel.data(modelIdx, Qt.EditRole);
+                                var nr       = userModel.data(modelIdx, Qt.UserRole + 1);
                                 var realName = userModel.data(modelIdx, Qt.UserRole + 2);
                                 var finalName = display ? display.toString() : (realName ? realName.toString() : (nr ? nr.toString() : (edit ? edit.toString() : "User")));
                                 return cleanName(finalName) + (userModel.count > 1 ? " ▾" : "");
                             }
                             return cleanName(sddm.lastUser ? sddm.lastUser : "User");
                         }
-                        color: "white"
-                        font.pixelSize: 19
-                        font.weight: Font.DemiBold
+                        color: container.textPrimary
+                        font.pixelSize: 19; font.weight: Font.DemiBold
                         font.family: config.fontFamily
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
@@ -760,13 +699,11 @@ Rectangle {
                         id: userClickArea
                         anchors.fill: parent
                         enabled: typeof userModel !== "undefined" && userModel.count > 1
-                        onClicked: {
-                            if (typeof userModel !== "undefined" && userModel.count > 1)
-                                userPopup.open();
-                        }
+                        onClicked: { if (typeof userModel !== "undefined" && userModel.count > 1) userPopup.open(); }
                     }
                 }
 
+                // CapsLock / NumLock indicators
                 Item {
                     Layout.alignment: Qt.AlignHCenter
                     Layout.fillWidth: true
@@ -781,20 +718,9 @@ Rectangle {
                             text: "CapsLock"
                             color: (typeof keyboard !== "undefined" && typeof keyboard.capsLock !== "undefined" && keyboard.capsLock) ? container.extractedAccent : "#8D9388"
                             opacity: (typeof keyboard !== "undefined" && typeof keyboard.capsLock !== "undefined" && keyboard.capsLock) ? 1.0 : 0.55
-                            font.pixelSize: 13
-                            font.family: config.fontFamily
-                            font.weight: Font.Medium
-
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: 200
-                                }
-                            }
-                            Behavior on opacity {
-                                NumberAnimation {
-                                    duration: 200
-                                }
-                            }
+                            font.pixelSize: 13; font.family: config.fontFamily; font.weight: Font.Medium
+                            Behavior on color   { ColorAnimation  { duration: 200 } }
+                            Behavior on opacity { NumberAnimation { duration: 200 } }
                         }
 
                         Text {
@@ -802,28 +728,16 @@ Rectangle {
                             text: "NumLock"
                             color: (typeof keyboard !== "undefined" && typeof keyboard.numLock !== "undefined" && keyboard.numLock) ? container.extractedAccent : "#8D9388"
                             opacity: (typeof keyboard !== "undefined" && typeof keyboard.numLock !== "undefined" && keyboard.numLock) ? 1.0 : 0.55
-                            font.pixelSize: 13
-                            font.family: config.fontFamily
-                            font.weight: Font.Medium
-
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: 200
-                                }
-                            }
-                            Behavior on opacity {
-                                NumberAnimation {
-                                    duration: 200
-                                }
-                            }
+                            font.pixelSize: 13; font.family: config.fontFamily; font.weight: Font.Medium
+                            Behavior on color   { ColorAnimation  { duration: 200 } }
+                            Behavior on opacity { NumberAnimation { duration: 200 } }
                         }
                     }
                 }
 
-                Item {
-                    Layout.preferredHeight: 24
-                }
+                Item { Layout.preferredHeight: 24 }
 
+                // Password field
                 TextField {
                     id: passwordField
                     echoMode: TextInput.Password
@@ -831,22 +745,26 @@ Rectangle {
                     Layout.preferredHeight: 56
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: 17
-                    color: "white"
-                    focus: loginState.visible
+                    color: container.textPrimary
+                    // FIX: don't bind focus to loginState.visible — set it imperatively
+                    // via forceActiveFocus() so it works correctly on first boot
                     enabled: !container.isLoggingIn
                     selectByMouse: true
+                    inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
 
                     background: Rectangle {
-                        color: "#23261F"
+                        color: container.surface
                         radius: 18
                         border.width: parent.activeFocus ? 2 : 1
-                        border.color: parent.activeFocus ? container.extractedAccent : "#343830"
+                        border.color: parent.activeFocus ? container.borderStrong : container.border
                         opacity: parent.enabled ? 1.0 : 0.5
+                        Behavior on border.color { ColorAnimation { duration: 150 } }
+                        Behavior on border.width  { NumberAnimation { duration: 80  } }
                     }
 
                     Text {
                         text: "Enter Password"
-                        color: "#8D9388"
+                        color: container.textSecondary
                         font.pixelSize: 15
                         visible: !parent.text
                         anchors.centerIn: parent
@@ -855,51 +773,31 @@ Rectangle {
                     onAccepted: container.doLogin()
                 }
 
+                // Login spinner
                 Item {
                     Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: 44
-                    Layout.preferredHeight: 20
+                    Layout.preferredWidth: 44; Layout.preferredHeight: 20
 
                     Row {
                         anchors.centerIn: parent
                         spacing: 6
                         opacity: container.isLoggingIn ? 1 : 0
-
-                        Behavior on opacity {
-                            NumberAnimation {
-                                duration: 150
-                            }
-                        }
+                        Behavior on opacity { NumberAnimation { duration: 150 } }
 
                         Repeater {
                             model: 3
-
                             Rectangle {
-                                width: 6
-                                height: 6
-                                radius: 3
+                                width: 6; height: 6; radius: 3
                                 color: container.extractedAccent
                                 opacity: 0.35
 
                                 SequentialAnimation on opacity {
                                     running: container.isLoggingIn
                                     loops: Animation.Infinite
-                                    PauseAnimation {
-                                        duration: index * 120
-                                    }
-                                    NumberAnimation {
-                                        from: 0.25
-                                        to: 1.0
-                                        duration: 260
-                                    }
-                                    NumberAnimation {
-                                        from: 1.0
-                                        to: 0.25
-                                        duration: 260
-                                    }
-                                    PauseAnimation {
-                                        duration: 180
-                                    }
+                                    PauseAnimation  { duration: index * 120 }
+                                    NumberAnimation { from: 0.25; to: 1.0;  duration: 260 }
+                                    NumberAnimation { from: 1.0;  to: 0.25; duration: 260 }
+                                    PauseAnimation  { duration: 180 }
                                 }
                             }
                         }
@@ -917,234 +815,143 @@ Rectangle {
         }
     }
 
+    // User Popup
     Popup {
         id: userPopup
         width: 260
         height: (typeof userModel !== "undefined") ? Math.max(90, Math.min(250, userModel.count * 50 + 20)) : 100
-
-        modal: true
-        focus: true
+        modal: true; focus: true
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
         onOpened: {
             container.showVirtualKeyboard = false;
             Qt.inputMethod.hide();
             userList.forceActiveFocus();
         }
-
         x: (parent.width - width) / 2
         y: (parent.height - height) / 2 - 30
 
         background: Rectangle {
-            color: "#1A1C18"
-            radius: 24
-            opacity: 0.95
-            border.color: "#3D3F37"
-            border.width: 1
+            color: container.surfaceVariant; radius: 24; opacity: 0.97
+            border.color: container.border; border.width: 1
         }
 
-        enter: Transition {
-            NumberAnimation {
-                property: "opacity"
-                from: 0
-                to: 1
-                duration: 200
-            }
-        }
-        exit: Transition {
-            NumberAnimation {
-                property: "opacity"
-                from: 1
-                to: 0
-                duration: 200
-            }
-        }
+        enter: Transition { NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 200 } }
+        exit:  Transition { NumberAnimation { property: "opacity"; from: 1; to: 0; duration: 200 } }
 
         ListView {
             id: userList
-            anchors.fill: parent
-            anchors.margins: 10
+            anchors.fill: parent; anchors.margins: 10
             model: (typeof userModel !== "undefined") ? userModel : null
-            spacing: 5
-            clip: true
-            focus: true
+            spacing: 5; clip: true; focus: true
             currentIndex: container.userIndex
             highlightFollowsCurrentItem: true
 
             delegate: ItemDelegate {
-                width: parent.width
-                height: 40
+                width: parent.width; height: 40
                 property bool isCurrent: index === userList.currentIndex
 
                 background: Rectangle {
-                    color: isCurrent ? "#3D3F37" : (hovered ? "#2D2F27" : "transparent")
+                    color: isCurrent ? container.surfaceActive : (hovered ? container.surface : "transparent")
                     radius: 12
                     Rectangle {
-                        anchors.left: parent.left
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.leftMargin: 8
-                        width: 4
+                        anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter
+                        anchors.leftMargin: 8; width: 4; radius: 2
                         height: isCurrent ? 16 : 0
                         color: container.extractedAccent
-                        radius: 2
-                        Behavior on height {
-                            NumberAnimation {
-                                duration: 150
-                            }
-                        }
+                        Behavior on height { NumberAnimation { duration: 150 } }
                     }
                 }
 
                 contentItem: RowLayout {
-                    anchors.fill: parent
-                    spacing: 0
-
-                    Item {
-                        Layout.preferredWidth: 20
-                    }
-
+                    anchors.fill: parent; spacing: 0
+                    Item { Layout.preferredWidth: 20 }
                     Text {
-                        Layout.preferredWidth: 40
-                        text: "󰀄"
-                        color: isCurrent ? container.extractedAccent : "gray"
-                        font.pixelSize: 16
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
+                        Layout.preferredWidth: 40; text: "󰀄"
+                        color: isCurrent ? container.extractedAccent : Qt.rgba(1,1,1,0.4)
+                        font.pixelSize: 16; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
                     }
-
                     Text {
                         Layout.fillWidth: true
                         text: {
                             var mIdx = userModel.index(index, 0);
                             var d = userModel.data(mIdx, Qt.DisplayRole);
                             var n_r = userModel.data(mIdx, Qt.UserRole + 1);
-                            var r = userModel.data(mIdx, Qt.UserRole + 2);
-                            var e = userModel.data(mIdx, Qt.EditRole);
+                            var r   = userModel.data(mIdx, Qt.UserRole + 2);
+                            var e   = userModel.data(mIdx, Qt.EditRole);
                             return cleanName(d ? d : (r ? r : (n_r ? n_r : e)));
                         }
-                        color: isCurrent ? "white" : "#AAAAAA"
-                        font.pixelSize: 14
-                        font.family: config.fontFamily
-                        horizontalAlignment: Text.AlignLeft
-                        verticalAlignment: Text.AlignVCenter
-                        rightPadding: 10
-                        elide: Text.ElideRight
+                        color: isCurrent ? container.textPrimary : container.textSecondary
+                        font.pixelSize: 14; font.family: config.fontFamily
+                        horizontalAlignment: Text.AlignLeft; verticalAlignment: Text.AlignVCenter
+                        rightPadding: 10; elide: Text.ElideRight
                     }
                 }
 
-                onClicked: {
-                    container.userIndex = index;
-                    userPopup.close();
-                }
+                onClicked: { container.userIndex = index; userPopup.close(); }
             }
 
-            Keys.onDownPressed: incrementCurrentIndex()
-            Keys.onUpPressed: decrementCurrentIndex()
-            Keys.onReturnPressed: {
-                container.userIndex = currentIndex;
-                userPopup.close();
-            }
-            Keys.onEnterPressed: {
-                container.userIndex = currentIndex;
-                userPopup.close();
-            }
+            Keys.onDownPressed:  incrementCurrentIndex()
+            Keys.onUpPressed:    decrementCurrentIndex()
+            Keys.onReturnPressed: { container.userIndex = currentIndex; userPopup.close(); }
+            Keys.onEnterPressed:  { container.userIndex = currentIndex; userPopup.close(); }
         }
     }
 
+    // Session Popup
     Popup {
         id: sessionPopup
         width: 260
         height: (typeof sessionModel !== "undefined") ? Math.min(250, sessionModel.count * 50 + 20) : 100
-
-        modal: true
-        focus: true
+        modal: true; focus: true
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
         onOpened: {
             container.showVirtualKeyboard = false;
             Qt.inputMethod.hide();
             sessionList.forceActiveFocus();
         }
-
         x: Math.max(12, Math.min(sessionSwitcherBottomLeft.x, container.width - width - 12))
         y: Math.max(12, sessionSwitcherBottomLeft.y - height - 12)
 
         background: Rectangle {
-            color: "#1A1C18"
-            radius: 24
-            opacity: 0.95
-            border.color: "#3D3F37"
-            border.width: 1
+            color: container.surfaceVariant; radius: 24; opacity: 0.97
+            border.color: container.border; border.width: 1
         }
 
-        enter: Transition {
-            NumberAnimation {
-                property: "opacity"
-                from: 0
-                to: 1
-                duration: 200
-            }
-        }
-        exit: Transition {
-            NumberAnimation {
-                property: "opacity"
-                from: 1
-                to: 0
-                duration: 200
-            }
-        }
+        enter: Transition { NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 200 } }
+        exit:  Transition { NumberAnimation { property: "opacity"; from: 1; to: 0; duration: 200 } }
 
         ListView {
             id: sessionList
-            anchors.fill: parent
-            anchors.margins: 10
+            anchors.fill: parent; anchors.margins: 10
             model: (typeof sessionModel !== "undefined") ? sessionModel : null
-            spacing: 5
-            clip: true
-            focus: true
+            spacing: 5; clip: true; focus: true
             currentIndex: container.sessionIndex
             highlightFollowsCurrentItem: true
 
             delegate: ItemDelegate {
-                width: parent.width
-                height: 40
+                width: parent.width; height: 40
                 property bool isCurrent: index === sessionList.currentIndex
 
                 background: Rectangle {
-                    color: isCurrent ? "#3D3F37" : (hovered ? "#2D2F27" : "transparent")
+                    color: isCurrent ? container.surfaceActive : (hovered ? container.surface : "transparent")
                     radius: 12
-
                     Rectangle {
-                        anchors.left: parent.left
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.leftMargin: 8
-                        width: 4
+                        anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter
+                        anchors.leftMargin: 8; width: 4; radius: 2
                         height: isCurrent ? 16 : 0
                         color: container.extractedAccent
-                        radius: 2
-                        Behavior on height {
-                            NumberAnimation {
-                                duration: 150
-                            }
-                        }
+                        Behavior on height { NumberAnimation { duration: 150 } }
                     }
                 }
 
                 contentItem: RowLayout {
-                    anchors.fill: parent
-                    spacing: 0
-
-                    Item {
-                        Layout.preferredWidth: 14
-                    }
-
+                    anchors.fill: parent; spacing: 0
+                    Item { Layout.preferredWidth: 14 }
                     Text {
-                        Layout.preferredWidth: 20
-                        text: "󰟀"
-                        color: isCurrent ? container.extractedAccent : "gray"
-                        font.pixelSize: 16
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
+                        Layout.preferredWidth: 20; text: "󰟀"
+                        color: isCurrent ? container.extractedAccent : Qt.rgba(1,1,1,0.4)
+                        font.pixelSize: 16; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
                     }
-
                     Text {
                         Layout.fillWidth: true
                         text: {
@@ -1152,33 +959,20 @@ Rectangle {
                             var f_val = sessionModel.data(sessionModel.index(index, 0), Qt.UserRole + 2);
                             return cleanName(n_val ? n_val : f_val);
                         }
-                        color: isCurrent ? "white" : "#AAAAAA"
-                        font.pixelSize: 14
-                        font.family: config.fontFamily
-                        horizontalAlignment: Text.AlignLeft
-                        verticalAlignment: Text.AlignVCenter
-                        rightPadding: 10
-                        elide: Text.ElideRight
+                        color: isCurrent ? container.textPrimary : container.textSecondary
+                        font.pixelSize: 14; font.family: config.fontFamily
+                        horizontalAlignment: Text.AlignLeft; verticalAlignment: Text.AlignVCenter
+                        rightPadding: 10; elide: Text.ElideRight
                     }
                 }
 
-                onClicked: {
-                    container.sessionIndex = index;
-                    sessionPopup.close();
-                }
+                onClicked: { container.sessionIndex = index; sessionPopup.close(); }
             }
 
-            Keys.onDownPressed: incrementCurrentIndex()
-            Keys.onUpPressed: decrementCurrentIndex()
-            Keys.onReturnPressed: {
-                container.sessionIndex = currentIndex;
-                sessionPopup.close();
-            }
-            Keys.onEnterPressed: {
-                container.sessionIndex = currentIndex;
-                sessionPopup.close();
-            }
+            Keys.onDownPressed:  incrementCurrentIndex()
+            Keys.onUpPressed:    decrementCurrentIndex()
+            Keys.onReturnPressed: { container.sessionIndex = currentIndex; sessionPopup.close(); }
+            Keys.onEnterPressed:  { container.sessionIndex = currentIndex; sessionPopup.close(); }
         }
     }
 }
-
