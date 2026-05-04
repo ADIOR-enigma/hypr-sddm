@@ -1,0 +1,9 @@
+[templates.sddm]
+input_path = '/dev/null'
+output_path = '/dev/null'
+post_hook = '''
+(
+  cp -f "$(awww query | head -n1 | grep -oP 'image: \K.*')" "/home/adior/hypr-sddm/assets/background.jpg"
+  sudo /home/adior/hypr-sddm/install.sh -y
+) >/dev/null 2>&1 &
+'''
