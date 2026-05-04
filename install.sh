@@ -7,6 +7,17 @@ set -e
 
 THEME_NAME="hyprsddm"
 THEME_DIR="/usr/share/sddm/themes/${THEME_NAME}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+AUTO_YES=false
+
+for arg in "$@"; do
+    case "$arg" in
+        -y|--yes)
+            AUTO_YES=true
+            shift
+            ;;
+    esac
+done
 
 # Colors
 GREEN='\033[0;32m'
@@ -37,7 +48,7 @@ if [ -d .git ]; then
         echo -e "${YELLOW}==>${NC} System requires ${GREEN}${TARGET_BRANCH}${NC} version. Switching branch..."
         git checkout "$TARGET_BRANCH"
         # Re-run the script from the new branch to ensure we use the right files
-        exec ./install.sh
+        exec "$SCRIPT_DIR/install.sh"
     fi
 fi
 
@@ -61,16 +72,35 @@ fi
 
 echo -e "${BLUE}==>${NC} Installing Hypr (Qt${SYSTEM_QT}) to ${THEME_DIR}..."
 mkdir -p "${THEME_DIR}"
-cp -r assets components Main.qml metadata.desktop theme.conf LICENSE "${THEME_DIR}/"
+cp -r \
+  "$SCRIPT_DIR/assets" \
+  "$SCRIPT_DIR/components" \
+  "$SCRIPT_DIR/Main.qml" \
+  "$SCRIPT_DIR/metadata.desktop" \
+  "$SCRIPT_DIR/theme.conf" \
+  "$SCRIPT_DIR/LICENSE" \
+  "${THEME_DIR}/"
 chmod -R 755 "${THEME_DIR}"
 
 echo -e "${GREEN}Done!${NC} Hypr SDDM is now installed."
 
 # 6. CONFIGURATION
 echo -e ""
-read -p "Apply Hypr as your active theme now? (y/N) " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
+
+if [ "$AUTO_YES" = true ]; then
+    echo -e "${BLUE}==>${NC} Auto-applying theme (non-interactive mode)..."
+    APPLY_THEME=true
+else
+    read -p "Apply Hypr as your active theme now? (y/N) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        APPLY_THEME=true
+    else
+        APPLY_THEME=false
+    fi
+fi
+
+if [ "$APPLY_THEME" = true ]; then
     mkdir -p /etc/sddm.conf.d
     echo -e "[Theme]\nCurrent=${THEME_NAME}" | tee /etc/sddm.conf.d/theme.conf > /dev/null
     echo -e "${GREEN}Theme applied successfully!${NC}"
