@@ -1,6 +1,6 @@
-# ✨ Hypr SDDM
+# 🎸 Hypr SDDM
 
-A clean, modern, and minimal SDDM theme inspired by hyprlock and styled with a sleek, contemporary Linux aesthetic. Supports only the latest Qt6 engine.
+A clean, modern, and minimal SDDM theme inspired by hyprlock and styled with a sleek, contemporary Linux aesthetic.
 
 <div align="center">
   <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/f31f433d-4518-4740-91e4-8a8ea5430de6" />
@@ -21,13 +21,13 @@ A clean, modern, and minimal SDDM theme inspired by hyprlock and styled with a s
 
 Before installing, make sure the required modules for your system are present to avoid rendering issues or a black screen:
 
-<details open>
-
+# Arch:
 ```bash
-# Arch: sudo pacman -S qt6-declarative qt6-svg qt6-quickcontrols2
+ sudo pacman -S qt6-declarative qt6-svg qt6-quickcontrols2
 ```
+# Fedora:
 ```bash
-# Fedora: sudo dnf install qt6-qtdeclarative qt6-qtsvg qt6-qtquickcontrols2
+ sudo dnf install qt6-qtdeclarative qt6-qtsvg qt6-qtquickcontrols2
 ```
 </details>
 
@@ -66,6 +66,8 @@ sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/hyprsddm
 Edit `theme.conf` or replace assets in `assets/`:
 - **Wallpaper:** Replace `assets/background.jpg`.
 - **Avatar:** Replace `assets/avatar.jpg`.
+
+You can also update ur Wallpaper with matugen, for that u need to add the install script to sudoers.
 
 ## 🤝 Credits
 
