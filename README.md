@@ -29,16 +29,19 @@ A clean, modern, and minimal SDDM theme inspired by hyprlock and styled with a s
 
 Before installing, make sure the required modules for your system are present to avoid rendering issues or a black screen:
 
-# Arch:
+### Arch:
 ```bash
- sudo pacman -S qt6-declarative qt6-svg qt6-quickcontrols2
+ sudo pacman -S qt6-declarative qt6-svg
 ```
-# Fedora:
-```bash
- sudo dnf install qt6-qtdeclarative qt6-qtsvg qt6-qtquickcontrols2
-```
-</details>
+## 🛠 Configuration & Testing
 
+### Preview Without Logging Out
+Run this command to preview the theme safely after installation:
+```bash
+cd /usr/share/sddm/themes/hyprsddm
+QT_IM_MODULE=qtvirtualkeyboard QML2_IMPORT_PATH=./components/ sddm-greeter-qt6 --test-mode --theme .
+```
+or just run the `./test.sh`
 
 ## 📦 2. Installation
 
@@ -62,14 +65,6 @@ sudo ./install.sh
    ```
 
 
-## 🛠 Configuration & Testing
-
-### Preview Without Logging Out
-Run this command to preview the theme safely:
-```bash
-cd /usr/share/sddm/themes/hyprsddm
-QT_IM_MODULE=qtvirtualkeyboard QML2_IMPORT_PATH=./components/ sddm-greeter-qt6 --test-mode --theme .
-```
 
 ### Customization
 Edit `theme.conf` or replace assets in `assets/`:
