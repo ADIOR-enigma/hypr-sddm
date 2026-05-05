@@ -2,8 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Effects
-//import QtQuick.VirtualKeyboard
-//import QtQuick.VirtualKeyboard.Settings
+import QtQuick.VirtualKeyboard
+import QtQuick.VirtualKeyboard.Settings
 import "components"
 
 Rectangle {
@@ -196,6 +196,7 @@ Rectangle {
                 var fh = finalColor.hsvHue;
                 var s = Math.max(0.35, Math.min(0.55, finalColor.hsvSaturation * 0.9));
                 container.extractedAccent = Qt.hsva(fh, s, 0.85, 1.0);
+                ThemeColors.extractedAccent = container.extractedAccent;
                 console.log("Pixie SDDM: SUCCESS! Extracted Hue: " + (fh * 360).toFixed(0) + "°");
                 processed = true;
             }
@@ -310,7 +311,7 @@ Rectangle {
             onClicked: sessionPopup.open()
         }
     }
-/*
+
     // ===== Virtual Keyboard Toggle (bottom-right) =====
     Rectangle {
         id: keyboardSwitcherBottomRight
@@ -406,7 +407,7 @@ Rectangle {
             active: container.showVirtualKeyboard
 
             Component.onCompleted: {
-                VirtualKeyboardSettings.styleName = "default";
+            	VirtualKeyboardSettings.styleName = "pixie";
                 VirtualKeyboardSettings.closeOnReturn = false;
                 VirtualKeyboardSettings.visibleFunctionKeys =
                     QtVirtualKeyboard.KeyboardFunctionKeys.None;
@@ -422,7 +423,7 @@ Rectangle {
             }
         }
     }
-*/
+
     // Power Bar
     PowerBar {
         anchors {
