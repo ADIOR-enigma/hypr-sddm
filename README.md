@@ -3,8 +3,16 @@
 A clean, modern, and minimal SDDM theme inspired by hyprlock and styled with a sleek, contemporary Linux aesthetic.
 
 <div align="center">
-  <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/f31f433d-4518-4740-91e4-8a8ea5430de6" />
-  <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/3afed31b-097c-449b-af4b-e4c0b1893cfd" />
+  <table>
+    <tr>
+      <td><img src="https://github.com/user-attachments/assets/69149e29-9040-4ea7-acdd-38e11ae2a3d6" width="480"/></td>
+      <td><img src="https://github.com/user-attachments/assets/da825aae-4aca-4f26-892a-243b8cafa7ac" width="480"/></td>
+    </tr>
+    <tr>
+      <td><img src="https://github.com/user-attachments/assets/d6772a7f-c34a-48d8-88c9-bf250017afcb" width="480"/></td>
+      <td><img src="https://github.com/user-attachments/assets/9c1c8dc3-c982-404f-a39d-64eba73fb1e8" width="480"/></td>
+    </tr>
+  </table>
 </div>
 
 ## 🌟 Features
@@ -59,7 +67,8 @@ sudo ./install.sh
 ### Preview Without Logging Out
 Run this command to preview the theme safely:
 ```bash
-sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/hyprsddm
+cd hypr-sddm
+QT_IM_MODULE=qtvirtualkeyboard QML2_IMPORT_PATH=./components/ sddm-greeter-qt6 --test-mode --theme .
 ```
 
 ### Customization
