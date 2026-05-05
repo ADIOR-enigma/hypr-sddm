@@ -106,7 +106,7 @@ Rectangle {
         }
     }
 
-    // ===== Dynamic Color Extraction =====
+    // Dynamic Color Extraction
     property color extractedAccent: "#A9C78F"
 
     function tone(h, s, v, a) {
@@ -132,7 +132,7 @@ Rectangle {
     // States
     property color error: Qt.rgba(1, 0.3, 0.3, 0.7)
 
-    // ===== Color Extraction Engine =====
+    // Color Extraction Engine
     Timer {
         id: colorDelay
         interval: 1000
@@ -212,12 +212,12 @@ Rectangle {
         }
     }
 
-    // ===== Fonts =====
+    // Fonts
     FontLoader { id: fontRegular; source: "assets/fonts/FlexRounded-R.ttf" }
     FontLoader { id: fontMedium;  source: "assets/fonts/FlexRounded-M.ttf" }
     FontLoader { id: fontBold;    source: "assets/fonts/FlexRounded-B.ttf" }
 
-    // ===== Background =====
+    // Background
     Image {
         id: backgroundImage
         source: config.background
@@ -225,7 +225,7 @@ Rectangle {
         fillMode: Image.PreserveAspectCrop
     }
 
-    // ── Blur layer (restored from v1) ──────────────────────────────────────
+    // Blur layer
     MultiEffect {
         id: backgroundBlur
         anchors.fill: parent
@@ -239,7 +239,7 @@ Rectangle {
         Behavior on blur    { NumberAnimation { duration: 400; easing.type: Easing.InOutQuad } }
     }
 
-    // Dark overlay (lighter than v1 since blur already dims)
+    // Dark overlay
     Rectangle {
         anchors.fill: parent
         color: "black"
@@ -247,7 +247,7 @@ Rectangle {
         Behavior on opacity { NumberAnimation { duration: 400 } }
     }
 
-    // ===== Session Switcher (bottom-left) =====
+    // Session Switcher (bottom-left)
     Rectangle {
         id: sessionSwitcherBottomLeft
         width: 210; height: 40
@@ -423,7 +423,7 @@ Rectangle {
         }
     }
 */
-    // ===== Power Bar =====
+    // Power Bar
     PowerBar {
         anchors {
             top: parent.top; right: parent.right
@@ -435,7 +435,7 @@ Rectangle {
         Behavior on opacity { NumberAnimation { duration: 300 } }
     }
 
-    // ===== Shortcuts =====
+    // Shortcuts
     Shortcut {
         sequence: "Escape"
         enabled: loginState.visible
@@ -455,7 +455,7 @@ Rectangle {
         onActivated: container.doLogin()
     }
 
-    // ===== Date Label =====
+    // Date Label
     Text {
         id: dateText
         text: Qt.formatDateTime(new Date(), "dddd, MMMM d")
@@ -467,7 +467,7 @@ Rectangle {
         Behavior on opacity { NumberAnimation { duration: 300 } }
     }
 
-    // ===== Lock Screen =====
+    // Lock Screen
     Item {
         id: lockState
         anchors.fill: parent
@@ -502,7 +502,7 @@ Rectangle {
         }
     }
 
-    // ===== Login Card =====
+    // Login Card
     Item {
         id: loginState
         anchors.fill: parent
@@ -815,7 +815,7 @@ Rectangle {
         }
     }
 
-    // ===== User Popup =====
+    // User Popup
     Popup {
         id: userPopup
         width: 260
@@ -897,7 +897,7 @@ Rectangle {
         }
     }
 
-    // ===== Session Popup =====
+    // Session Popup
     Popup {
         id: sessionPopup
         width: 260
