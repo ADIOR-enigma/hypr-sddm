@@ -67,7 +67,7 @@ sudo ./install.sh
 ### Preview Without Logging Out
 Run this command to preview the theme safely:
 ```bash
-cd hypr-sddm
+cd /usr/share/sddm/themes/hyprsddm
 QT_IM_MODULE=qtvirtualkeyboard QML2_IMPORT_PATH=./components/ sddm-greeter-qt6 --test-mode --theme .
 ```
 
