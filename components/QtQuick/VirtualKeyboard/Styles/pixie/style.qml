@@ -5,19 +5,6 @@ import "../../../../"
 KeyboardStyle {
     id: style
 
-    readonly property color keyBg:          ThemeColors.keyBg
-    readonly property color keyPress:       ThemeColors.keyPress
-    readonly property color keySpecial:     ThemeColors.keySpecial
-    readonly property color keyBorder:      ThemeColors.keyBorder
-    readonly property color keyBorderStrong: ThemeColors.keyBorderStrong
-    readonly property color accent:         ThemeColors.extractedAccent
-    readonly property color textCol:        "#FFFFFF"
-    readonly property color textDim:        "#8D9388"
-
-    readonly property real margin:    Math.round(13 * scaleHint)
-    readonly property real fontSize:  Math.round(72 * scaleHint)
-    readonly property real fontSizeSm: Math.round(52 * scaleHint)
-
     keyboardDesignWidth:  2560
     keyboardDesignHeight: 800
     keyboardRelativeLeftMargin:   114 / keyboardDesignWidth
@@ -32,20 +19,20 @@ KeyboardStyle {
         Rectangle {
             id: keyBg
             anchors.fill: parent
-            anchors.margins: style.margin
+            anchors.margins: Math.round(13 * scaleHint)
             radius: 10
-            color: style.keyBg
-            border.color: style.keyBorder
+            color: ThemeColors.keyBg
+            border.color: ThemeColors.keyBorder
             border.width: 1
 
             Text {
                 anchors.fill: parent
-                anchors.margins: style.margin
+                anchors.margins: Math.round(13 * scaleHint)
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 text: control.displayText
-                color: style.textCol
-                font.pixelSize: style.fontSize
+                color: "#FFFFFF"
+                font.pixelSize: Math.round(58 * scaleHint)
                 font.family: "sans-serif"
                 fontSizeMode: Text.Fit
             }
@@ -53,7 +40,7 @@ KeyboardStyle {
         states: State {
             name: "pressed"
             when: control.pressed
-            PropertyChanges { target: keyBg; color: style.keyPress }
+            PropertyChanges { target: keyBg; color: ThemeColors.keyPress }
         }
     }
 
@@ -62,23 +49,23 @@ KeyboardStyle {
         Rectangle {
             id: bsBg
             anchors.fill: parent
-            anchors.margins: style.margin
+            anchors.margins: Math.round(13 * scaleHint)
             radius: 10
-            color: style.keySpecial
-            border.color: style.keyBorder
+            color: ThemeColors.keySpecial
+            border.color: ThemeColors.keyBorder
             border.width: 1
 
             Text {
                 anchors.centerIn: parent
                 text: "⌫"
-                color: style.accent
-                font.pixelSize: style.fontSize
+                color: "#FFFFFF"
+                font.pixelSize: Math.round(58 * scaleHint)
             }
         }
         states: State {
             name: "pressed"
             when: control.pressed
-            PropertyChanges { target: bsBg; color: style.keyPress }
+            PropertyChanges { target: bsBg; color: ThemeColors.keyPress }
         }
     }
 
@@ -87,23 +74,23 @@ KeyboardStyle {
         Rectangle {
             id: shiftBg
             anchors.fill: parent
-            anchors.margins: style.margin
+            anchors.margins: Math.round(13 * scaleHint)
             radius: 10
-            color: style.keySpecial
-            border.color: style.keyBorder
+            color: ThemeColors.keySpecial
+            border.color: ThemeColors.keyBorder
             border.width: 1
-    
+
             Text {
                 anchors.centerIn: parent
                 text: "⇧"
-                color: style.textCol
-                font.pixelSize: style.fontSize
+                color: "#FFFFFF"
+                font.pixelSize: Math.round(58 * scaleHint)
             }
         }
         states: State {
-                name: "pressed"
-                when: control.pressed
-                PropertyChanges { target: shiftBg; color: style.keyPress }
+            name: "pressed"
+            when: control.pressed
+            PropertyChanges { target: shiftBg; color: ThemeColors.keyPress }
         }
     }
 
@@ -112,23 +99,23 @@ KeyboardStyle {
         Rectangle {
             id: spaceBg
             anchors.fill: parent
-            anchors.margins: style.margin
+            anchors.margins: Math.round(13 * scaleHint)
             radius: 10
-            color: style.keyBg
-            border.color: style.keyBorder
+            color: ThemeColors.keyBg
+            border.color: ThemeColors.keyBorder
             border.width: 1
 
             Text {
                 anchors.centerIn: parent
                 text: "space"
-                color: style.textDim
-                font.pixelSize: style.fontSizeSm
+                color: "#FFFFFF"
+                font.pixelSize: Math.round(42 * scaleHint)
             }
         }
         states: State {
             name: "pressed"
             when: control.pressed
-            PropertyChanges { target: spaceBg; color: style.keyPress }
+            PropertyChanges { target: spaceBg; color: ThemeColors.keyPress }
         }
     }
 
@@ -137,23 +124,23 @@ KeyboardStyle {
         Rectangle {
             id: enterBg
             anchors.fill: parent
-            anchors.margins: style.margin
+            anchors.margins: Math.round(13 * scaleHint)
             radius: 10
-            color: Qt.rgba(style.accent.r, style.accent.g, style.accent.b, 0.18)
-            border.color: style.accent
+            color: Qt.rgba(ThemeColors.extractedAccent.r, ThemeColors.extractedAccent.g, ThemeColors.extractedAccent.b, 0.18)
+            border.color: ThemeColors.extractedAccent
             border.width: 1
 
             Text {
                 anchors.centerIn: parent
                 text: "↵"
-                color: style.accent
-                font.pixelSize: style.fontSize
+                color: "#FFFFFF"
+                font.pixelSize: Math.round(58 * scaleHint)
             }
         }
         states: State {
             name: "pressed"
             when: control.pressed
-            PropertyChanges { target: enterBg; color: Qt.darker(style.accent, 1.4) }
+            PropertyChanges { target: enterBg; color: Qt.darker(ThemeColors.extractedAccent, 1.4) }
         }
     }
 
@@ -162,27 +149,27 @@ KeyboardStyle {
         Rectangle {
             id: symBg
             anchors.fill: parent
-            anchors.margins: style.margin
+            anchors.margins: Math.round(13 * scaleHint)
             radius: 10
-            color: style.keySpecial
-            border.color: style.keyBorder
+            color: ThemeColors.keySpecial
+            border.color: ThemeColors.keyBorder
             border.width: 1
 
             Text {
                 anchors.fill: parent
-                anchors.margins: style.margin
+                anchors.margins: Math.round(13 * scaleHint)
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 text: control.displayText
-                color: style.textDim
-                font.pixelSize: style.fontSizeSm
+                color: "#FFFFFF"
+                font.pixelSize: Math.round(42 * scaleHint)
                 fontSizeMode: Text.Fit
             }
         }
         states: State {
             name: "pressed"
             when: control.pressed
-            PropertyChanges { target: symBg; color: style.keyPress }
+            PropertyChanges { target: symBg; color: ThemeColors.keyPress }
         }
     }
 
@@ -191,23 +178,23 @@ KeyboardStyle {
         Rectangle {
             id: hideBg
             anchors.fill: parent
-            anchors.margins: style.margin
+            anchors.margins: Math.round(13 * scaleHint)
             radius: 10
-            color: style.keySpecial
-            border.color: style.keyBorder
+            color: ThemeColors.keySpecial
+            border.color: ThemeColors.keyBorder
             border.width: 1
 
             Text {
                 anchors.centerIn: parent
                 text: "▾"
-                color: style.textDim
-                font.pixelSize: style.fontSize
+                color: "#FFFFFF"
+                font.pixelSize: Math.round(58 * scaleHint)
             }
         }
         states: State {
             name: "pressed"
             when: control.pressed
-            PropertyChanges { target: hideBg; color: style.keyPress }
+            PropertyChanges { target: hideBg; color: ThemeColors.keyPress }
         }
     }
 
@@ -216,21 +203,21 @@ KeyboardStyle {
         Rectangle {
             id: modeBg
             anchors.fill: parent
-            anchors.margins: style.margin
+            anchors.margins: Math.round(13 * scaleHint)
             radius: 10
-            color: style.keySpecial
-            border.color: style.keyBorder
+            color: ThemeColors.keySpecial
+            border.color: ThemeColors.keyBorder
             border.width: 1
 
             Text {
                 id: modeText
                 anchors.fill: parent
-                anchors.margins: style.margin
+                anchors.margins: Math.round(13 * scaleHint)
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 text: control.displayText
-                color: style.textDim
-                font.pixelSize: style.fontSizeSm
+                color: "#FFFFFF"
+                font.pixelSize: Math.round(42 * scaleHint)
                 fontSizeMode: Text.Fit
             }
 
@@ -241,14 +228,14 @@ KeyboardStyle {
                 width: parent.width * 0.2
                 height: Math.round(4 * scaleHint)
                 radius: 2
-                color: style.accent
+                color: ThemeColors.extractedAccent
                 visible: control.mode
             }
         }
         states: State {
             name: "pressed"
             when: control.pressed
-            PropertyChanges { target: modeBg; color: style.keyPress }
+            PropertyChanges { target: modeBg; color: ThemeColors.keyPress }
         }
     }
 
@@ -259,9 +246,9 @@ KeyboardStyle {
         id: charPreview
         Rectangle {
             anchors.fill: parent
-            color: style.keyPress
+            color: ThemeColors.keyPress
             radius: 12
-            border.color: style.accent
+            border.color: ThemeColors.extractedAccent
             border.width: 1
 
             Text {
@@ -270,8 +257,8 @@ KeyboardStyle {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 text: charPreview.text
-                color: style.textCol
-                font.pixelSize: Math.round(82 * scaleHint)
+                color: "#FFFFFF"
+                font.pixelSize: Math.round(66 * scaleHint)
                 fontSizeMode: Text.Fit
             }
         }
@@ -290,24 +277,24 @@ KeyboardStyle {
             id: altText
             anchors.centerIn: parent
             text: model.text
-            color: style.textDim
-            font.pixelSize: style.fontSize
+            color: "#FFFFFF"
+            font.pixelSize: Math.round(58 * scaleHint)
         }
         states: State {
             name: "current"
             when: altItem.ListView.isCurrentItem
-            PropertyChanges { target: altText; color: style.textCol }
+            PropertyChanges { target: altText; color: "#FFFFFF" }
         }
     }
 
     alternateKeysListHighlight: Rectangle {
-        color: style.keyPress
+        color: ThemeColors.keyPress
         radius: 10
     }
 
     alternateKeysListBackground: Rectangle {
-        color: style.keySpecial
-        border.color: style.keyBorder
+        color: ThemeColors.keySpecial
+        border.color: ThemeColors.keyBorder
         border.width: 1
         radius: 12
     }
@@ -315,7 +302,7 @@ KeyboardStyle {
     // Navigation highlight
     navigationHighlight: Rectangle {
         color: "transparent"
-        border.color: style.accent
+        border.color: ThemeColors.extractedAccent
         border.width: Math.round(5 * scaleHint)
         radius: 6
     }
