@@ -6,11 +6,11 @@ A clean, modern, and minimal SDDM theme inspired by hyprlock and styled with a s
   <table>
     <tr>
       <td><img src="https://github.com/user-attachments/assets/69149e29-9040-4ea7-acdd-38e11ae2a3d6" width="480"/></td>
-      <td><img src="https://github.com/user-attachments/assets/da825aae-4aca-4f26-892a-243b8cafa7ac" width="480"/></td>
+      <td><img src="https://github.com/user-attachments/assets/2aaf32d4-3173-41fd-9b68-65cb9f40e071" width="480"/></td>
     </tr>
     <tr>
       <td><img src="https://github.com/user-attachments/assets/d6772a7f-c34a-48d8-88c9-bf250017afcb" width="480"/></td>
-      <td><img src="https://github.com/user-attachments/assets/9c1c8dc3-c982-404f-a39d-64eba73fb1e8" width="480"/></td>
+      <td><img src="https://github.com/user-attachments/assets/764bc975-3779-4558-bc62-0a4a8fd76089" width="480"/></td>
     </tr>
   </table>
 </div>
