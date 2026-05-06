@@ -59,7 +59,7 @@ KeyboardStyle {
                 anchors.centerIn: parent
                 text: "⌫"
                 color: "#FFFFFF"
-                font.pixelSize: Math.round(58 * scaleHint)
+                font.pixelSize: Math.round(42 * scaleHint)
             }
         }
         states: State {
@@ -82,9 +82,9 @@ KeyboardStyle {
 
             Text {
                 anchors.centerIn: parent
-                text: "⇧"
+                text: "⇪"
                 color: "#FFFFFF"
-                font.pixelSize: Math.round(58 * scaleHint)
+                font.pixelSize: Math.round(70 * scaleHint)
             }
         }
         states: State {
