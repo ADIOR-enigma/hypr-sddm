@@ -295,7 +295,7 @@ Rectangle {
                     }
                     return "Hyprland";
                 }
-                color: container.textPrimary
+                color: container.extractedAccent
                 font.pixelSize: 12
                 font.weight: Font.Medium
                 font.family: config.fontFamily
@@ -312,7 +312,7 @@ Rectangle {
         }
     }
 
-    // ===== Virtual Keyboard Toggle (bottom-right) =====
+    // Virtual Keyboard Toggle (bottom-right)
     Rectangle {
         id: keyboardSwitcherBottomRight
         width: 44; height: 44
@@ -356,7 +356,7 @@ Rectangle {
         }
     }
 
-    // ===== Virtual Keyboard Panel (themed) =====
+    // Virtual Keyboard Panel (themed)
     Item {
         id: keyboardContainer
         z: 200
@@ -881,7 +881,7 @@ Rectangle {
                             var e   = userModel.data(mIdx, Qt.EditRole);
                             return cleanName(d ? d : (r ? r : (n_r ? n_r : e)));
                         }
-                        color: isCurrent ? container.textPrimary : container.textSecondary
+                        color: isCurrent ? container.extractedAccent : container.textSecondary
                         font.pixelSize: 14; font.family: config.fontFamily
                         horizontalAlignment: Text.AlignLeft; verticalAlignment: Text.AlignVCenter
                         rightPadding: 10; elide: Text.ElideRight
@@ -960,7 +960,7 @@ Rectangle {
                             var f_val = sessionModel.data(sessionModel.index(index, 0), Qt.UserRole + 2);
                             return cleanName(n_val ? n_val : f_val);
                         }
-                        color: isCurrent ? container.textPrimary : container.textSecondary
+                        color: isCurrent ? container.extractedAccent : container.textSecondary
                         font.pixelSize: 14; font.family: config.fontFamily
                         horizontalAlignment: Text.AlignLeft; verticalAlignment: Text.AlignVCenter
                         rightPadding: 10; elide: Text.ElideRight
