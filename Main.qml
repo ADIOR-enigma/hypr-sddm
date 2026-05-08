@@ -366,8 +366,6 @@ Rectangle {
         x: (container.width - width) / 2
         y: container.height - height - 14
 
-        // FIX: drive visibility from our own flag, not Qt.inputMethod.visible
-        // which creates a boot-time chicken-and-egg deadlock
         visible: loginState.visible && container.showVirtualKeyboard
         opacity: visible ? 1.0 : 0.0
         Behavior on opacity { NumberAnimation { duration: 220 } }
@@ -402,8 +400,6 @@ Rectangle {
                 margins: 12
             }
 
-            // active must be true whenever we want it ready —
-            // decoupled from Qt.inputMethod.visible to avoid the boot freeze
             active: container.showVirtualKeyboard
 
             Component.onCompleted: {
