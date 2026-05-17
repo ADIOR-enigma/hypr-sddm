@@ -36,12 +36,11 @@ Before installing, make sure the required modules for your system are present to
 ## 🛠 Configuration & Testing
 
 ### Preview Without Logging Out
-Run this command to preview the theme safely after installation:
+Run `./test.sh` command to preview the theme safely after installation or
 ```bash
 cd /usr/share/sddm/themes/hyprsddm
 QT_IM_MODULE=qtvirtualkeyboard QML2_IMPORT_PATH=./components/ sddm-greeter-qt6 --test-mode --theme .
 ```
-or just run the `./test.sh`
 
 ## 📦 2. Installation
 
